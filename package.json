@@ -1,0 +1,26 @@
+{
+  "name": "marketplaceservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CMUResidentMe/MarketPlaceService.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CMUResidentMe/MarketPlaceService/issues"
+  },
+  "homepage": "https://github.com/CMUResidentMe/MarketPlaceService#readme",
+  "dependencies": {
+    "apollo-server-express": "^3.13.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "graphql": "^16.8.1",
+    "mongoose": "^8.3.2"
+  }
+}
