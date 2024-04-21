@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 const PORT = process.env.PORT || 5121;
-
+app.use(express.json({limit: '50mb'}));
 
 
 app.use('/graphql', graphqlHTTP((req) => ({
