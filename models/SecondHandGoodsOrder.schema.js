@@ -11,6 +11,7 @@ const SecondHandGoodsOrderSchema = new mongoose.Schema({
         default: "pending",
     },
     contact: { type: String, required: true },
+    tradePlace: { type: String },
 }, { timestamps: true });
 
 const SecondHandGoodsOrder = mongoose.model("SecondHandGoodsOrder", SecondHandGoodsOrderSchema);

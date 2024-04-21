@@ -24,6 +24,7 @@ const schema = buildSchema(`
     goods: SecondHandGoods!
     buyer: String!
     contact: String!
+    tradePlace: String!
   }
 
   type Query {
@@ -32,13 +33,14 @@ const schema = buildSchema(`
     getGoodsById(id: ID!): SecondHandGoods
     getOrdersByUser(userId: ID!): [SecondHandGoodsOrder]
     isGoodsOwner(goodsId: ID!, userId: ID!): Boolean
+    getSoldOrdersByUser(publishUser: String!): [SecondHandGoodsOrder]
   }
 
   type Mutation {
     addGoods(title: String!, description: String!, price: Float!, image: String, category: String!, tradePlace: String!, contact: String!, publishUser: String!): SecondHandGoods
     updateGoods(id: ID!, title: String, description: String, price: Float, image: String, category: String, tradePlace: String, contact: String, publishUser: String!): SecondHandGoods
     deleteGoods(id: ID!, userId: String!): String
-    buyGoods(goodsId: ID!, userId: ID!, contact: String!): SecondHandGoodsOrder
+    buyGoods(goodsId: ID!, userId: ID!, contact: String!, tradePlace: String!): SecondHandGoodsOrder
   }
 `);
 
@@ -51,8 +53,13 @@ const root = {
         }
         return goods.publishUser.toString() === userId;
     },
+
     getAllGoods: async () => {
         return await SecondHandGoods.find();
+    },
+    getSoldOrdersByUser: async ({ publishUser }) => {
+        const allOrders = await SecondHandGoodsOrder.find().populate("goods");
+        return allOrders.filter(order => order.goods.publishUser.toString() === publishUser);
     },
     getGoodsByUser: async (args, context) => {
         const publishUser = args.publishUser;
@@ -99,7 +106,7 @@ const root = {
         await SecondHandGoods.findByIdAndDelete(id);
         return "Goods successfully deleted";
     },
-    buyGoods: async ({ goodsId, userId, contact }) => {
+    buyGoods: async ({ goodsId, userId, contact, tradePlace }) => {
         const goods = await SecondHandGoods.findById(goodsId);
         if (!goods) {
             throw new Error("No goods found with that ID");
@@ -111,6 +118,7 @@ const root = {
         return  await SecondHandGoodsOrder.create({
             goods: new mongoose.mongo.ObjectId(goodsId),
             buyer: new mongoose.mongo.ObjectId(userId),
+            tradePlace,
             contact
         });
     },
