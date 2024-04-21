@@ -1,0 +1,15 @@
+version: '3'
+services:
+  marketplaceservice:
+    build: .
+    ports:
+      - "7700:7700"
+    environment:
+      - PORT=7700
+      - MONGODB_URI=mongodb+srv://rhuang4:123456.@cluster0.lnn7guw.mongodb.net/marketplace?retryWrites=true&w=majority
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
