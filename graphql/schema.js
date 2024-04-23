@@ -3,7 +3,7 @@ const { graphqlHTTP } = require('express-graphql');
 const { SecondHandGoods } = require('../models/SecondHandeGoods.schema');
 const mongoose = require("mongoose");
 const {SecondHandGoodsOrder} = require("../models/SecondHandGoodsOrder.schema");
-
+const { KafkaService } = require("../KafkaService");
 const schema = buildSchema(`
   type SecondHandGoods {
     id: ID!
@@ -44,7 +44,8 @@ const schema = buildSchema(`
   }
 `);
 
-
+const kafkaService = new KafkaService();
+kafkaService.initService();
 const root = {
     isGoodsOwner: async ({ goodsId, userId }) => {
         const goods = await SecondHandGoods.findById(goodsId);
@@ -115,12 +116,22 @@ const root = {
             throw new Error("Cannot buy your own goods");
         }
         await SecondHandGoods.findByIdAndUpdate(goodsId, { status: "sold" });
-        return  await SecondHandGoodsOrder.create({
+
+        const order = await SecondHandGoodsOrder.create({
             goods: new mongoose.mongo.ObjectId(goodsId),
             buyer: new mongoose.mongo.ObjectId(userId),
             tradePlace,
             contact
         });
+
+        await kafkaService.publishMessage(
+            process.env.NOTIFICATION_TYPE,
+            process.env.MarketPlace_TOPIC,
+            `Your goods ${goods.title} has been sold, the buyer contact is ${contact} and trade place is ${tradePlace}`,
+            `${goods.publishUser.toString()}`,
+            order._id.toString()
+        )
+        return order;
     },
     getOrdersByUser: async ({ userId }) => {
         return await SecondHandGoodsOrder.find({ buyer: new mongoose.mongo.ObjectId(userId) }).populate("goods");
