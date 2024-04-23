@@ -127,7 +127,7 @@ const root = {
         await kafkaService.publishMessage(
             process.env.NOTIFICATION_TYPE,
             process.env.MarketPlace_TOPIC,
-            `Your goods ${goods.title} has been sold, the buyer contact is ${contact} and trade place is ${tradePlace}`,
+            `Someone has interest with ${goods.title} contact is ${contact} and trade place is ${tradePlace}`,
             `${goods.publishUser.toString()}`,
             order._id.toString()
         )
