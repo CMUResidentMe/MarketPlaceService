@@ -1,6 +1,5 @@
-
-const { Kafka } = require('kafkajs')
-
+const { Kafka } = require('kafkajs');
+const moment = require('moment-timezone');
 
 class KafkaService {
   constructor() {
@@ -23,11 +22,16 @@ class KafkaService {
     }
   }
 
+  getMomentDate = () => {
+    return moment().tz(process.env.TIME_ZONE).format("MM-DD HH:mm");
+  }
+
   publishMessage = async (notificationType, topic, message, userId, orderId) => {
     try {
+      const eventTime = this.getMomentDate(); // Use moment to format the date
       const notification = {
         notificationType,
-        eventTime: new Date().toISOString(),
+        eventTime: eventTime, // Now formatted "MM-DD HH:mm"
         owner: userId,
         message,
         sourceID: orderId,
@@ -51,10 +55,8 @@ class KafkaService {
       console.log(err);
     }
   }
-
 }
 
 module.exports = {
     KafkaService
-}
-
+};
